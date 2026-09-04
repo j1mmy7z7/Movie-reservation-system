@@ -1,6 +1,6 @@
 from rest_framework import generics
-from serializers import MovieSerializer
-from models import Movie
+from system.serializers import MovieSerializer
+from system.models import Movie
 
 class MovieList(generics.ListCreateAPIView):
     queryset = Movie.objects.all()

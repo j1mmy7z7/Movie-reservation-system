@@ -1,1 +1,1 @@
-from movies import MovieList, MovieDetail
+from .movies import MovieList, MovieDetail

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from models import Movie, Showtime
+from system.models import Movie, Showtime
 
 
 class MovieSerializer(serializers.Serializer):
