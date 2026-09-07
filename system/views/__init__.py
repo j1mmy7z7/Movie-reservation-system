@@ -1,3 +1,3 @@
 from .movies import MovieList, MovieDetail
 from .showtimes import ShowtimeList, ShowtimeDetail
-from .cinema import CinemaList, CinemaDetail
+from .cinema import CinemaList, CinemaDetail, CinemaShowtimeList
