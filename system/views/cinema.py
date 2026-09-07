@@ -1,6 +1,6 @@
 from rest_framework import generics
-from system.models import Cinema
-from system.serializers import CinemaSerializer
+from system.models import Cinema, Showtime
+from system.serializers import CinemaSerializer, ShowtimeSerializer
 
 
 class CinemaList(generics.ListAPIView):
@@ -13,3 +13,9 @@ class CinemaDetail(generics.RetrieveUpdateDestroyAPIView):
             if self.request.method == "GET":
                 return Cinema.objects.prefetch_related("screens")
             return Cinema.objects.all()
+
+class CinemaShowtimeList(generics.ListAPIView):
+    serializer_class = ShowtimeSerializer
+
+    def get_queryset(self):
+        return Showtime.objects.filter(screen__cinema_id=self.kwargs["cinema_id"])
