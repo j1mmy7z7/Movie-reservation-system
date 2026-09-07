@@ -7,5 +7,8 @@ class ShowtimeList(generics.ListCreateAPIView):
     serializer_class = ShowtimeSerializer
 
 class ShowtimeDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Showtime.objects.all()
     serializer_class = ShowtimeSerializer
+    def get_queryset(self):
+            if self.request.method == "GET":
+                return Cinema.objects.prefetch_related("screens")
+            return Cinema.objects.all()
