@@ -7,7 +7,7 @@ class CinemaList(generics.ListAPIView):
     queryset = Cinema.objects.all()
     serializer_class = CinemaSerializer
 
-class CinemaDetail(generics.RetrieveUpdateDestroyAPIView):
+class CinemaDetail(generics.RetrieveAPIView):
     serializer_class = CinemaSerializer
     def get_queryset(self):
             if self.request.method == "GET":
