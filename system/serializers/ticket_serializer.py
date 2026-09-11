@@ -61,11 +61,11 @@ class HoldSerializer(serializers.Serializer):
     @transaction.atomic
     def create(self, validated_data):
         client = self.context['request'].user
-        showtime = self.context['showtime']
+        showtime_id = self.context['showtime_id']
         seat_ids = validated_data['seat_ids']
 
         tickets = Ticket.objects.select_for_update().filter(
-            showtime=showtime,
+            showtime_id=showtime_id,
             seat_id__in=seat_ids,
         ).filter(
             Q(status=Ticket.Status.AVAILABLE) | Q(status=Ticket.Status.HELD, held_until__lt=timezone.now())
