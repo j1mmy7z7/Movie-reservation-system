@@ -6,7 +6,7 @@ from django.db import transaction
 from system.models import Ticket, Booking
 
 
-class TicketSerializer(serializers.Serializer):
+class TicketSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ticket
         fields = ['id', 'showtime', 'seat', 'booking', 'held_by', 'held_until']
