@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import MovieList, MovieDetail, ShowtimeList, ShowtimeDetail, CinemaList, CinemaDetail, CinemaShowtimeList
+from .views import MovieList, MovieDetail, ShowtimeList, ShowtimeDetail, CinemaList, CinemaDetail, CinemaShowtimeList, ShowtimeTicketList
 
 urlpatterns = [
     path("movies/", MovieList.as_view()),
@@ -9,4 +9,5 @@ urlpatterns = [
     path("cinemas/", CinemaList.as_view()),
     path("cinemas/<uuid:pk>/", CinemaDetail.as_view()),
     path("cinemas/<uuid:cinema_id>/showtimes/", CinemaShowtimeList.as_view()),
+    path("showtimes/<uuid:showtime_id>/tickets/", ShowtimeTicketList.as_view()),
 ]
