@@ -30,7 +30,10 @@ SECRET_KEY = "django-insecure-hajo8^$z#p=wm97v^ru1dnp^z@+n08g=dqgcc9cjytivs9rh%t
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+# ngrok tunnel URL
+ALLOWED_HOSTS = [
+    'localhost', '127.0.0.1', env('NGROK_URL')
+]
 
 
 # Application definition
