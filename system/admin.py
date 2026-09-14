@@ -6,6 +6,7 @@ from system.models import (
     Movie,
     Showtime,
     Ticket
+)
 
 admin.site.register(Cinema)
 
@@ -18,7 +19,7 @@ class ShowtimeAdmin(admin.ModelAdmin):
         super().save_model(request, obj, form, change)
         if is_new:
             for seat in obj.screen.seats.all():
-                Ticlket.objects.create(showtime=obj, seat=seat)
+                Ticket.objects.create(showtime=obj, seat=seat)
 
 
 
