@@ -78,14 +78,24 @@ class PaymentInitiateSerializer(serializers.Serializer):
             )
             tickets.update(payment=payment)
 
-        response = stk_push(
-            phone_number=phone_number,
-            amount=amount,
-            account_reference=str(payment.id),
-            transaction_desc="Movie ticket booking",
-        )
+            try:
+                response = stk_push(
+                    phone_number=phone_number,
+                    amount=amount,
+                    account_reference=str(payment.id),
+                    transaction_desc="Movie ticket booking",
+                )
+            except requests.RequestException:
+                payment.status = MpesaPayment.Status.FAILED
+                payment.save()
+                raise serializers.ValidationError("Could not reach M-Pesa. Please try again.")
+            except KeyError:
+                # Daraja responded, but not with the shape we expected (missing CheckoutRequestID
+                payment.status = MpesaPayment.Status.FAILED
+                payment.save()
+                raise serializers.ValidationError("M-Pesa returned an unexpected response.")
 
-        payment.checkout_request_id = response["CheckoutRequestID"]
-        payment.save()
+            payment.checkout_request_id = response["CheckoutRequestID"]
+            payment.save()
 
         return payment
