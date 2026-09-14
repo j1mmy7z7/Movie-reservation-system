@@ -1,5 +1,11 @@
 from django.contrib import admin
-from system.models import Cinema, Screen, Seat, Movie, Showtime
+from system.models import (
+    Cinema,
+    Screen,
+    Seat,
+    Movie,
+    Showtime,
+    Ticket
 
 admin.site.register(Cinema)
 

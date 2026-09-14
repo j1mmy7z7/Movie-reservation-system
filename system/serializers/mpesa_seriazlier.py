@@ -74,7 +74,7 @@ class PaymentInitiateSerializer(serializers.Serializer):
             payment = MpesaPayment.objects.create(
                 phone_number=phone_number,
                 amount=amount,
-                checkout_request_id="",   # filled in right after
+                checkout_request_id="",
             )
             tickets.update(payment=payment)
 
