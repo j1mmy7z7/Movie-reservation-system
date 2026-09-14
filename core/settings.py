@@ -21,6 +21,13 @@ env = environ.Env()
 
 environ.Env.read_env(BASE_DIR / '.env')
 
+# load mpesa env variables
+MPESA_CONSUMER_KEY = env("MPESA_CONSUMER_KEY")
+MPESA_CONSUMER_SECRET = env("MPESA_CONSUMER_SECRET")
+MPESA_SHORTCODE = env("MPESA_SHORTCODE")
+MPESA_PASSKEY = env("MPESA_PASSKEY")
+MPESA_CALLBACK_URL = env("MPESA_CALLBACK_URL")
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
 

@@ -4,6 +4,7 @@ from system.serializers import (
     BookingSerializer,
     TicketSerializer,
     HoldSerializer,
+    PaymentInitiateSerializer,
 )
 
 
@@ -42,3 +43,18 @@ class HoldTickets(generics.CreateAPIView):
         serializer.is_valid(raise_exception=True)
         tickets = serializer.save()
         return response.Response(data=TicketSerializer(tickets, many=True).data)
+
+
+
+class InitiatePayment(generics.CreateAPIView):
+    serializer_class = PaymentInitiateSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        payment = serializer.save()
+        return response.Response({
+            "payment_id": payment.id,
+            "status": payment.status,
+            "message": "Check your phone to complete payment.",
+        })
