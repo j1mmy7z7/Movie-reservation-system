@@ -19,6 +19,23 @@ class Booking(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
 
+class MpesaPayment(models.Model):
+    class Status(models.TextChoices):
+        PENDING = "pending", "Pending"
+        COMPLETED = "completed", "Completed"
+        FAILED = "failed", "Failed"
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    phone_number = models.CharField(max_length=20)
+    checkout_request_id = models.CharField(max_length=100)
+    mpesa_transaction_id = models.CharField(max_length=255)
+    status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
+    amount = models.DecimalField(max_digits=8, decimal_places=2)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ("created_at",)
+
 
 class Ticket(models.Model):
     class Status(models.TextChoices):
@@ -33,6 +50,7 @@ class Ticket(models.Model):
     booking = models.ForeignKey(Booking, null=True, blank=True, on_delete=models.SET_NULL, related_name="tickets")
     held_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)
     held_until = models.DateTimeField(null=True, blank=True)
+    payment = models.ForeignKey(MpesaPayment, null=True, blank=True, on_delete=models.SET_NULL, related_name="tickets")
 
     class Meta:
         unique_together = ("showtime", "seat")
