@@ -5,9 +5,11 @@ from system.serializers import (
     TicketSerializer,
     HoldSerializer,
     PaymentInitiateSerializer,
+    MpesaPaymentSerializer,
 )
 from django.utils import timezone
 from datetime import timedelta
+
 
 
 class ShowtimeTicketList(generics.ListAPIView):
@@ -106,3 +108,10 @@ class MpesaCallback(views.APIView):
             payment.save()
 
         return response.Response({"ResultCode": 0, "ResultDesc": "Accepted"})
+
+class PaymentStatus(generics.RetrieveAPIView):
+    serializer_class = MpesaPaymentSerializer
+    lookup_field = "id"
+
+    def get_queryset(self):
+        return MpesaPayment.objects.filter(tickets__held_by=self.request.user).distinct()

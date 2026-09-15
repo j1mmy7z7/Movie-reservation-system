@@ -7,4 +7,5 @@ from .bookings import (
     InitiatePayment,
     CancelBooking,
     MpesaCallback,
+    PaymentStatus,
 )
