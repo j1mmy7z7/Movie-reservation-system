@@ -5,18 +5,18 @@ from .cinema import Seat
 from .movies import Showtime
 
 
-class Booking(models.Model):
-    class Status(models.TextChoices):
-        PENDING = "pending", "Pending"
-        CONFIRMED = "confirmed", "Confirmed"
-        CANCELLED = "cancelled", "Cancelled"
-        EXPIRED = "expired", "Expired"
+# class Booking(models.Model):
+#     class Status(models.TextChoices):
+#         PENDING = "pending", "Pending"
+#         CONFIRMED = "confirmed", "Confirmed"
+#         CANCELLED = "cancelled", "Cancelled"
+#         EXPIRED = "expired", "Expired"
 
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    client = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="bookings")
-    status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
-    total_amount = models.DecimalField(max_digits=8, decimal_places=2)
-    created_at = models.DateTimeField(auto_now_add=True)
+#     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+#     client = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="bookings")
+#     status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
+#     total_amount = models.DecimalField(max_digits=8, decimal_places=2)
+#     created_at = models.DateTimeField(auto_now_add=True)
 
 
 class MpesaPayment(models.Model):

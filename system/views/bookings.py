@@ -1,7 +1,7 @@
-from rest_framework import generics, response, views,
+from rest_framework import generics, response, views
 from system.models import (Booking, Ticket, MpesaPayment)
 from system.serializers import (
-    BookingSerializer,
+    # BookingSerializer,
     TicketSerializer,
     HoldSerializer,
     PaymentInitiateSerializer,
@@ -23,14 +23,14 @@ class ShowtimeTicketList(generics.ListAPIView):
         return Ticket.objects.filter(showtime_id=self.kwargs["showtime_id"])
 
 
-class BookingList(generics.ListCreateAPIView):
-    """
-    List and create bookings for the authenticated client.
-    """
-    serializer_class = BookingSerializer
+# class BookingList(generics.ListCreateAPIView):
+#     """
+#     List and create bookings for the authenticated client.
+#     """
+#     serializer_class = BookingSerializer
 
-    def get_queryset(self):
-        return Booking.objects.filter(client=self.request.user)
+#     def get_queryset(self):
+#         return Booking.objects.filter(client=self.request.user)
 
 
 
