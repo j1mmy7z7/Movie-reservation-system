@@ -8,6 +8,7 @@ from system.serializers import (
 )
 from django.utils import timezone
 from datetime import timedelta
+from rest_framework.permissions import IsAuthenticated
 
 
 
@@ -15,7 +16,7 @@ class ShowtimeTicketList(generics.ListAPIView):
     """
     List all tickets for a given showtime.
     """
-
+    permission_classes = [IsAuthenticated]
     serializer_class = TicketSerializer
 
     def get_queryset(self):
@@ -35,6 +36,8 @@ class ShowtimeTicketList(generics.ListAPIView):
 
 class HoldTickets(generics.CreateAPIView):
     serializer_class = HoldSerializer
+    permission_classes = [IsAuthenticated]
+
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
@@ -51,6 +54,7 @@ class HoldTickets(generics.CreateAPIView):
 
 class InitiatePayment(generics.CreateAPIView):
     serializer_class = PaymentInitiateSerializer
+    permission_classes = [IsAuthenticated]
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -66,6 +70,7 @@ class CancelBooking(views.APIView):
     """
     Cancel a booking by marking tickets as available.
     """
+    permission_classes = [IsAuthenticated]
 
     def post(self, request):
         ticket_ids = request.data.get("ticket_ids", [])
@@ -109,6 +114,7 @@ class MpesaCallback(views.APIView):
         return response.Response({"ResultCode": 0, "ResultDesc": "Accepted"})
 
 class PaymentStatus(generics.RetrieveAPIView):
+    permission_classes = [IsAuthenticated]
     serializer_class = MpesaPaymentSerializer
     lookup_field = "id"
 
