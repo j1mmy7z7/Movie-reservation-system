@@ -47,7 +47,6 @@ class Ticket(models.Model):
     showtime = models.ForeignKey(Showtime, on_delete=models.CASCADE, related_name="tickets")
     seat = models.ForeignKey(Seat, on_delete=models.CASCADE)
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.AVAILABLE)
-    booking = models.ForeignKey(Booking, null=True, blank=True, on_delete=models.SET_NULL, related_name="tickets")
     held_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)
     held_until = models.DateTimeField(null=True, blank=True)
     payment = models.ForeignKey(MpesaPayment, null=True, blank=True, on_delete=models.SET_NULL, related_name="tickets")

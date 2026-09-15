@@ -1,7 +1,6 @@
 from rest_framework import generics, response, views
-from system.models import (Booking, Ticket, MpesaPayment)
+from system.models import (Ticket, MpesaPayment)
 from system.serializers import (
-    # BookingSerializer,
     TicketSerializer,
     HoldSerializer,
     PaymentInitiateSerializer,

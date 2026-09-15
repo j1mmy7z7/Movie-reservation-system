@@ -4,7 +4,10 @@ from datetime import timedelta
 from django.db.models import Q
 from rest_framework import serializers
 from django.db import transaction
-from system.models import Ticket, Booking, MpesaPayment
+from system.models import (
+    Ticket,
+    MpesaPayment,
+)
 
 HOLD_DURATION = timedelta(minutes=10)
 
