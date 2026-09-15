@@ -1,5 +1,5 @@
-from rest_framework import generics, response, views
-from system.models import Booking, Ticket
+from rest_framework import generics, response, views,
+from system.models import (Booking, Ticket, MpesaPayment)
 from system.serializers import (
     BookingSerializer,
     TicketSerializer,
@@ -78,3 +78,31 @@ class CancelBooking(views.APIView):
             status=Ticket.Status.AVAILABLE, held_by=None, held_until=None, payment=None
         )
         return response.Response({"cancelled": count})
+
+
+class MpesaCallback(views.APIView):
+
+    def post(self, request):
+        body = request.data.get("Body", {}).get("stkCallback", {})
+        checkout_request_id = body.get("CheckoutRequestID")
+        result_code = body.get("ResultCode")
+
+        try:
+            payment = MpesaPayment.objects.get(checkout_request_id=checkout_request_id)
+        except MpesaPayment.DoesNotExist:
+            return response.Response({"ResultCode": 0, "ResultDesc": "Accepted"})
+
+        if result_code == 0:
+            metadata = {
+                item["Name"]: item.get("Value")
+                for item in body.get("CallbackMetadata", {}).get("Item", [])
+            }
+            payment.status = MpesaPayment.Status.COMPLETED
+            payment.mpesa_transaction_id = metadata.get("MpesaReceiptNumber", "")
+            payment.save()
+            payment.tickets.update(status=Ticket.Status.BOOKED)
+        else:
+            payment.status = MpesaPayment.Status.FAILED
+            payment.save()
+
+        return response.Response({"ResultCode": 0, "ResultDesc": "Accepted"})

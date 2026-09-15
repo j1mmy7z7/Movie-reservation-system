@@ -3,7 +3,7 @@ from .views import (
     MovieList, MovieDetail, ShowtimeList,
     ShowtimeDetail, CinemaList, CinemaDetail,
     CinemaShowtimeList, ShowtimeTicketList, HoldTickets,
-    InitiatePayment, CancelBooking
+    InitiatePayment, CancelBooking, MpesaCallback,
 )
 
 urlpatterns = [
@@ -18,4 +18,5 @@ urlpatterns = [
     path("showtimes/<uuid:showtime_id>/hold/", HoldTickets.as_view()),
     path("payments/initiate/", InitiatePayment.as_view()),
     path("payments/cancel/", CancelBooking.as_view()),
+    path("mpesa/callback/", MpesaCallback.as_view()),
 ]

@@ -6,4 +6,5 @@ from .bookings import (
     HoldTickets,
     InitiatePayment,
     CancelBooking,
+    MpesaCallback,
 )
