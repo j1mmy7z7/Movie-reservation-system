@@ -9,3 +9,4 @@ from .bookings import (
     MpesaCallback,
     PaymentStatus,
 )
+from .client import Register, ClientDetail
