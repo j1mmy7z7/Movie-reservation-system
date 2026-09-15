@@ -4,7 +4,7 @@ from datetime import timedelta
 from django.db.models import Q
 from rest_framework import serializers
 from django.db import transaction
-from system.models import Ticket, Booking
+from system.models import Ticket, Booking, MpesaPayment
 
 HOLD_DURATION = timedelta(minutes=10)
 
@@ -69,6 +69,8 @@ class HoldSerializer(serializers.Serializer):
             seat_id__in=seat_ids,
         ).filter(
             Q(status=Ticket.Status.AVAILABLE) | Q(status=Ticket.Status.HELD, held_until__lt=timezone.now())
+        ).filter(
+            Q(payment__isnull=True) | Q(payment__status=MpesaPayment.Status.FAILED)
         )
 
         if tickets.count() != len(seat_ids):
