@@ -82,4 +82,4 @@ class HoldSerializer(serializers.Serializer):
             held_until=timezone.now() + HOLD_DURATION,
         )
 
-        return Ticket.objects.filter(showtime=showtime, seat_id__in=seat_ids)
+        return Ticket.objects.filter(showtime_id=showtime_id, seat_id__in=seat_ids)
