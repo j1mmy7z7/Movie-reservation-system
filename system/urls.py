@@ -3,7 +3,7 @@ from .views import (
     MovieList, MovieDetail, ShowtimeList,
     ShowtimeDetail, CinemaList, CinemaDetail,
     CinemaShowtimeList, ShowtimeTicketList, HoldTickets,
-    InitiatePayment
+    InitiatePayment, CancelBooking
 )
 
 urlpatterns = [
@@ -17,4 +17,5 @@ urlpatterns = [
     path("showtimes/<uuid:showtime_id>/tickets/", ShowtimeTicketList.as_view()),
     path("showtimes/<uuid:showtime_id>/hold/", HoldTickets.as_view()),
     path("payments/initiate/", InitiatePayment.as_view()),
+    path("payments/cancel/", CancelBooking.as_view()),
 ]

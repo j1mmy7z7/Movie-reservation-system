@@ -1,4 +1,4 @@
-from rest_framework import generics, response
+from rest_framework import generics, response, views
 from system.models import Booking, Ticket
 from system.serializers import (
     BookingSerializer,
@@ -6,6 +6,8 @@ from system.serializers import (
     HoldSerializer,
     PaymentInitiateSerializer,
 )
+from django.utils import timezone
+from datetime import timedelta
 
 
 class ShowtimeTicketList(generics.ListAPIView):
@@ -58,3 +60,21 @@ class InitiatePayment(generics.CreateAPIView):
             "status": payment.status,
             "message": "Check your phone to complete payment.",
         })
+
+class CancelBooking(views.APIView):
+    """
+    Cancel a booking by marking tickets as available.
+    """
+
+    def post(self, request):
+        ticket_ids = request.data.get("ticket_ids", [])
+        tickets = Ticket.objects.filter(
+            id__in=ticket_ids, status=Ticket.Status.BOOKED, held_by=request.user
+        )
+        cutoff = timezone.now() + timedelta(minutes=10)
+        tickets = tickets.filter(showtime__start_time__gt=cutoff)
+
+        count = tickets.update(
+            status=Ticket.Status.AVAILABLE, held_by=None, held_until=None, payment=None
+        )
+        return response.Response({"cancelled": count})
