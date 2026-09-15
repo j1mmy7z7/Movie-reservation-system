@@ -9,6 +9,10 @@ from django.utils import timezone
 from system.models import MpesaPayment, Ticket
 
 
+class MpesaPaymentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MpesaPayment
+        fields = ["id", "status", "amount", "phone_number", "mpesa_transaction_id", "created_at", "checkout_request_id"]
 
 def get_access_token():
     url = f"{settings.MPESA_BASE_URL}/oauth/v1/generate?grant_type=client_credentials"
