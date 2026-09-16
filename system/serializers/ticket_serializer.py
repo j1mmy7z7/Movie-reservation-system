@@ -61,28 +61,55 @@ class HoldSerializer(serializers.Serializer):
         child=serializers.UUIDField(), write_only=True
     )
 
-    @transaction.atomic
     def create(self, validated_data):
-        client = self.context['request'].user
-        showtime_id = self.context['showtime_id']
-        seat_ids = validated_data['seat_ids']
+        client = self.context["request"].user
+        showtime_id = self.context["showtime_id"]
+        seat_ids = validated_data["seat_ids"]
 
-        tickets = Ticket.objects.select_for_update().filter(
-            showtime_id=showtime_id,
-            seat_id__in=seat_ids,
-        ).filter(
-            Q(status=Ticket.Status.AVAILABLE) | Q(status=Ticket.Status.HELD, held_until__lt=timezone.now())
-        ).filter(
-            Q(payment__isnull=True) | Q(payment__status=MpesaPayment.Status.FAILED)
-        )
+        with transaction.atomic():
+            base = Ticket.objects.select_for_update().filter(
+                showtime_id=showtime_id,
+                seat_id__in=seat_ids,
+            )
 
-        if tickets.count() != len(seat_ids):
-                        raise serializers.ValidationError("One or more seats are no longer available.")
+            found_seat_ids = set(base.values_list("seat_id", flat=True))
+            missing = set(seat_ids) - found_seat_ids
+            if missing:
+                raise serializers.ValidationError({
+                    "detail": "One or more seats don't exist for this showtime.",
+                    "seat_ids": list(missing),
+                })
 
-        tickets.update(
-            status=Ticket.Status.HELD,
-            held_by=client,
-            held_until=timezone.now() + HOLD_DURATION,
-        )
+            if base.filter(showtime__start_time__lte=timezone.now() + BOOKING_CUTOFF).exists():
+                raise serializers.ValidationError("This showtime is starting too soon to book.")
+
+            claimable = base.filter(
+                Q(status=Ticket.Status.AVAILABLE) |
+                Q(status=Ticket.Status.HELD, held_until__lt=timezone.now())
+            )
+            claimable_seat_ids = set(claimable.values_list("seat_id", flat=True))
+            taken = set(seat_ids) - claimable_seat_ids
+            if taken:
+                raise serializers.ValidationError({
+                    "detail": "One or more selected seats are already taken.",
+                    "seat_ids": list(taken),
+                })
+
+            locked_ok = claimable.filter(
+                Q(payment__isnull=True) | Q(payment__status=MpesaPayment.Status.FAILED)
+            )
+            locked_ok_seat_ids = set(locked_ok.values_list("seat_id", flat=True))
+            payment_locked = set(seat_ids) - locked_ok_seat_ids
+            if payment_locked:
+                raise serializers.ValidationError({
+                    "detail": "One or more seats have a payment in progress.",
+                    "seat_ids": list(payment_locked),
+                })
+
+            locked_ok.update(
+                status=Ticket.Status.HELD,
+                held_by=client,
+                held_until=timezone.now() + HOLD_DURATION,
+            )
 
         return Ticket.objects.filter(showtime_id=showtime_id, seat_id__in=seat_ids)
