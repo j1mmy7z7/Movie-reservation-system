@@ -9,7 +9,16 @@ from system.models import (
     MpesaPayment,
 )
 
+
+"""
+this is how long one can book tickets before initiatiing payments
+if the time is past but payment has been initiated, the hold duration is extended
+since tickets with payments are filtered out, the hold duration is extended to cover the booking cutoff
+"""
 HOLD_DURATION = timedelta(minutes=10)
+
+""" people can book ticks till 10 minutes before the showtime """
+BOOKING_CUTOFF = timedelta(minutes=10)
 
 
 class TicketSerializer(serializers.ModelSerializer):

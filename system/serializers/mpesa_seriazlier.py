@@ -55,6 +55,9 @@ def stk_push(*, phone_number, amount, account_reference, transaction_desc):
 
 
 class PaymentInitiateSerializer(serializers.Serializer):
+    """
+    Serializer for initiating a payment via M-Pesa.
+    """
     ticket_ids = serializers.ListField(child=serializers.UUIDField())
     phone_number = serializers.CharField()
 

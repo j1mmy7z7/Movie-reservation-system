@@ -35,6 +35,9 @@ class ShowtimeTicketList(generics.ListAPIView):
 
 
 class HoldTickets(generics.CreateAPIView):
+    """
+    Hold tickets for the authenticated client.
+    """
     serializer_class = HoldSerializer
     permission_classes = [IsAuthenticated]
 
@@ -53,6 +56,9 @@ class HoldTickets(generics.CreateAPIView):
 
 
 class InitiatePayment(generics.CreateAPIView):
+    """
+    Initiate a payment via M-Pesa for the booked tickets.
+    """
     serializer_class = PaymentInitiateSerializer
     permission_classes = [IsAuthenticated]
 
@@ -87,6 +93,10 @@ class CancelBooking(views.APIView):
 
 
 class MpesaCallback(views.APIView):
+    """
+    Handle the M-Pesa callback from the payment gateway.
+    """
+
 
     def post(self, request):
         body = request.data.get("Body", {}).get("stkCallback", {})
@@ -114,6 +124,9 @@ class MpesaCallback(views.APIView):
         return response.Response({"ResultCode": 0, "ResultDesc": "Accepted"})
 
 class PaymentStatus(generics.RetrieveAPIView):
+    """
+    Check if the payment has been completed or failed.
+    """
     permission_classes = [IsAuthenticated]
     serializer_class = MpesaPaymentSerializer
     lookup_field = "id"
