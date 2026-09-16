@@ -1,3 +1,5 @@
+import logging
+
 from rest_framework import generics, response, views
 from system.models import (Ticket, MpesaPayment)
 from system.serializers import (
@@ -10,7 +12,7 @@ from django.utils import timezone
 from datetime import timedelta
 from rest_framework.permissions import IsAuthenticated
 
-
+logger = logging.getLogger(__name__)
 
 class ShowtimeTicketList(generics.ListAPIView):
     """
@@ -21,6 +23,14 @@ class ShowtimeTicketList(generics.ListAPIView):
 
     def get_queryset(self):
         return Ticket.objects.filter(showtime_id=self.kwargs["showtime_id"])
+
+    def get(self, request, *args, **kwargs):
+        logger.info("ShowtimeTicketList GET request received")
+        try:
+            return super().get(request, *args, **kwargs)
+        except Exception as e:
+            logger.error(f"Error fetching showtime ticket list: {e}")
+            raise
 
 
 # class BookingList(generics.ListCreateAPIView):
@@ -48,11 +58,16 @@ class HoldTickets(generics.CreateAPIView):
         return context
 
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        tickets = serializer.save()
-        return response.Response(data=TicketSerializer(tickets, many=True).data)
-
+        try:
+            logger.info(f"HoldTickets POST request received for user {request.user.username}")
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            tickets = serializer.save()
+            logger.info(f"HoldTickets POST request: held {len(tickets)} tickets")
+            return response.Response(data=TicketSerializer(tickets, many=True).data)
+        except Exception as e:
+            logger.error(f"Error holding tickets for user {request.user.username}: {e}")
+            raise
 
 
 class InitiatePayment(generics.CreateAPIView):
@@ -63,14 +78,20 @@ class InitiatePayment(generics.CreateAPIView):
     permission_classes = [IsAuthenticated]
 
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        payment = serializer.save()
-        return response.Response({
-            "payment_id": payment.id,
-            "status": payment.status,
-            "message": "Check your phone to complete payment.",
-        })
+        try:
+            logger.info(f"InitiatePayment POST request received for user {request.user.username}")
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            payment = serializer.save()
+            logger.info(f"Payment initiated successfully for user {request.user.username}")
+            return response.Response({
+                "payment_id": payment.id,
+                "status": payment.status,
+                "message": "Check your phone to complete payment.",
+            })
+        except Exception as e:
+            logger.error(f"Error initiating payment for user {request.user.username}: {e}")
+            raise
 
 class CancelTickets(views.APIView):
     """
@@ -79,17 +100,23 @@ class CancelTickets(views.APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        ticket_ids = request.data.get("ticket_ids", [])
-        tickets = Ticket.objects.filter(
-            id__in=ticket_ids, status=Ticket.Status.BOOKED, held_by=request.user
-        )
-        cutoff = timezone.now() + timedelta(minutes=10)
-        tickets = tickets.filter(showtime__start_time__gt=cutoff)
+        try:
+            logger.info(f"CancelTickets POST request received for user {request.user.username}")
+            ticket_ids = request.data.get("ticket_ids", [])
+            tickets = Ticket.objects.filter(
+                id__in=ticket_ids, status=Ticket.Status.BOOKED, held_by=request.user
+            )
+            cutoff = timezone.now() + timedelta(minutes=10)
+            tickets = tickets.filter(showtime__start_time__gt=cutoff)
 
-        count = tickets.update(
-            status=Ticket.Status.AVAILABLE, held_by=None, held_until=None, payment=None
-        )
-        return response.Response({"cancelled": count})
+            count = tickets.update(
+                status=Ticket.Status.AVAILABLE, held_by=None, held_until=None, payment=None
+            )
+            logger.info(f"CancelTickets POST request: cancelled {count} tickets")
+            return response.Response({"cancelled": count})
+        except Exception as e:
+            logger.error(f"Error cancelling tickets for user {request.user.username}: {e}")
+            raise
 
 
 class MpesaCallback(views.APIView):
@@ -105,7 +132,9 @@ class MpesaCallback(views.APIView):
 
         try:
             payment = MpesaPayment.objects.get(checkout_request_id=checkout_request_id)
+            logger.info(f"MpesaCallback POST request: payment {payment.pk} updated")
         except MpesaPayment.DoesNotExist:
+            logger.warning(f"MpesaCallback POST request: payment with checkout_request_id {checkout_request_id} not found")
             return response.Response({"ResultCode": 0, "ResultDesc": "Accepted"})
 
         if result_code == 0:
@@ -117,9 +146,11 @@ class MpesaCallback(views.APIView):
             payment.mpesa_transaction_id = metadata.get("MpesaReceiptNumber", "")
             payment.save()
             payment.tickets.update(status=Ticket.Status.BOOKED)
+            logger.info(f"MpesaCallback POST request: payment {payment.pk} updated")
         else:
             payment.status = MpesaPayment.Status.FAILED
             payment.save()
+            logger.info(f"MpesaCallback POST request: payment {payment.pk} failed")
 
         return response.Response({"ResultCode": 0, "ResultDesc": "Accepted"})
 
@@ -133,3 +164,11 @@ class PaymentStatus(generics.RetrieveAPIView):
 
     def get_queryset(self):
         return MpesaPayment.objects.filter(tickets__held_by=self.request.user).distinct()
+
+    def get(self, request, *args, **kwargs):
+        logger.info(f"PaymentStatus GET request received for user {self.request.user.username}")
+        try:
+            return super().get(request, *args, **kwargs)
+        except Exception as e:
+            logger.error(f"Error fetching payment status for user {self.request.user.username}: {e}")
+            raise

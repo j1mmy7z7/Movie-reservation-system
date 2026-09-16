@@ -35,7 +35,7 @@ MPESA_CALLBACK_URL = env("MPESA_CALLBACK_URL")
 SECRET_KEY = "django-insecure-hajo8^$z#p=wm97v^ru1dnp^z@+n08g=dqgcc9cjytivs9rh%t"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 # ngrok tunnel URL
 ALLOWED_HOSTS = [
@@ -60,6 +60,26 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ],
+}
+
+LOGGING = {
+    "version": 1,
+    "handlers": {
+        "file": {
+            "class": "logging.FileHandler",
+            "filename": "logs/system.log",
+        },
+    },
+    "root": {
+        "handlers": ["file"],
+        "level": "DEBUG",
+    },
+    "formatters": {
+        "verbose": {
+            "format": "{levelname} {asctime} {name} {module}.{funcName} {message}",
+            "style": "{",
+        },
+    },
 }
 
 MIDDLEWARE = [
