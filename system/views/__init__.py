@@ -5,7 +5,7 @@ from .bookings import (
     ShowtimeTicketList,
     HoldTickets,
     InitiatePayment,
-    CancelBooking,
+    CancelTickets,
     MpesaCallback,
     PaymentStatus,
 )

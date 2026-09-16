@@ -72,7 +72,7 @@ class InitiatePayment(generics.CreateAPIView):
             "message": "Check your phone to complete payment.",
         })
 
-class CancelBooking(views.APIView):
+class CancelTickets(views.APIView):
     """
     Cancel a booking by marking tickets as available.
     """
