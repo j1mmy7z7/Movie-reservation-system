@@ -13,7 +13,7 @@ class Movie(models.Model):
 
 class Showtime(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name="showtimes")
+    movie = models.ForeignKey(Movie, on_delete=models.PROTECT, related_name="showtimes")
     screen = models.ForeignKey(Screen, on_delete=models.CASCADE, related_name="showtimes")
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()

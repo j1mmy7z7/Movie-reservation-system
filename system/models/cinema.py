@@ -10,7 +10,7 @@ class Cinema(models.Model):
 
 class Screen(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    cinema = models.ForeignKey(Cinema, on_delete=models.CASCADE, related_name="screens")
+    cinema = models.ForeignKey(Cinema, on_delete=models.PROTECT, related_name="screens")
     name = models.CharField(max_length=50)   #
 
     class Meta:
