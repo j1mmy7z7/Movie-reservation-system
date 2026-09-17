@@ -6,7 +6,7 @@ from .views import (
     CinemaShowtimeList, ShowtimeTicketList, HoldTickets,
     InitiatePayment, CancelTickets, MpesaCallback,
     PaymentStatus,
-    Register, ClientDetail,
+    Register, ClientDetail, health_check
 )
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
@@ -22,6 +22,7 @@ urlpatterns = [
     path("showtimes/<uuid:showtime_id>/hold/", HoldTickets.as_view()),
     path("payments/initiate/", InitiatePayment.as_view()),
     path("tickets/cancel/", CancelTickets.as_view()),
+    path("health/", health_check),
     path("payments/<uuid:id>/", PaymentStatus.as_view()),
     path("mpesa/callback/", MpesaCallback.as_view()),
     path("auth/register/", Register.as_view()),

@@ -10,3 +10,4 @@ from .bookings import (
     PaymentStatus,
 )
 from .client import Register, ClientDetail
+from .health_checks import health_check
