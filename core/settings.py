@@ -62,12 +62,17 @@ REST_FRAMEWORK = {
     ],
 }
 
+LOGS_DIR = BASE_DIR / "logs"
+LOGS_DIR.mkdir(parents=True, exist_ok=True)
+
+
 LOGGING = {
     "version": 1,
     "handlers": {
         "file": {
             "class": "logging.FileHandler",
-            "filename": "logs/system.log",
+            "filename": LOGS_DIR / "system.log",
+            "formatter": "verbose",
         },
     },
     "root": {
