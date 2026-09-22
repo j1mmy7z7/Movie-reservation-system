@@ -46,3 +46,14 @@ class CinemaTests(APITestCase):
         self.assertEqual(response.data['title'], "Test Movie")
         self.assertEqual(response.data['duration_minutes'], 120)
         self.assertEqual(response.data['description'], "Test Description movie 1")
+
+    def test_showtimes_list(self):
+        response = self.client.get(f'/cinemas/{self.cinema.id}/showtimes/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+
+    def test_showtime_detail(self):
+        response = self.client.get(f'/showtimes/{self.showtime.id}/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['movie']['title'], "Test Movie")
+        self.assertEqual(response.data['screen']['name'], "Test Screen")
