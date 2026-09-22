@@ -28,16 +28,10 @@ class CinemaTests(APITestCase):
         self.assertEqual(response.data[0]['name'], "Test Cinema")
 
     def test_screen_list(self):
-        response = self.client.get('/screens/')
+        response = self.client.get(f'/cinemas/{self.cinema.id}/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 1)
-        self.assertEqual(response.data[0]['name'], "Test Screen")
-
-    def test_screen_detail(self):
-        response = self.client.get(f'/screens/{self.screen.id}/')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['name'], "Test Screen")
-        self.assertEqual(response.data['cinema'], self.cinema.id)
+        self.assertEqual(len(response.data['screens']), 1)
+        self.assertEqual(response.data['screens'][0]['name'], "Test Screen")
 
     def test_movie_list(self):
         response = self.client.get('/movies/')
