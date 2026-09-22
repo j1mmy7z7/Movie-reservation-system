@@ -19,7 +19,7 @@ class ShowtimeList(generics.ListAPIView):
 
 
 class ShowtimeDetail(generics.RetrieveAPIView):
-    queryset = Showtime.objects.all()
+    queryset = Showtime.objects.select_related("movie", "screen")
     serializer_class = ShowtimeSerializer
 
     def get(self, request, *args, **kwargs):
