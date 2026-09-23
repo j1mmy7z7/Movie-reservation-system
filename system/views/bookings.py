@@ -1,6 +1,6 @@
 import logging
 
-from rest_framework import generics, response, views
+from rest_framework import generics, response, views, status
 from system.models import (Ticket, MpesaPayment)
 from system.serializers import (
     TicketSerializer,
@@ -64,7 +64,7 @@ class HoldTickets(generics.CreateAPIView):
             serializer.is_valid(raise_exception=True)
             tickets = serializer.save()
             logger.info(f"HoldTickets POST request: held {len(tickets)} tickets")
-            return response.Response(data=TicketSerializer(tickets, many=True).data)
+            return response.Response(data=TicketSerializer(tickets, many=True).data, status=status.HTTP_201_CREATED)
         except Exception as e:
             logger.error(f"Error holding tickets for user {request.user.username}: {e}")
             raise
