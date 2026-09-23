@@ -78,7 +78,7 @@ class HoldSerializer(serializers.Serializer):
         seat_ids = validated_data["seat_ids"]
 
         with transaction.atomic():
-            base = Ticket.objects.select_for_update().filter(
+            base = Ticket.objects.select_for_update(of=("self",)).filter(
                 showtime_id=showtime_id,
                 seat_id__in=seat_ids,
             )
