@@ -8,6 +8,7 @@ from system.models import (
     Ticket,
     MpesaPayment,
 )
+from .cinema_serializer import SeatSerializer
 
 
 """
@@ -22,9 +23,10 @@ BOOKING_CUTOFF = timedelta(minutes=10)
 
 
 class TicketSerializer(serializers.ModelSerializer):
+    seat = SeatSerializer(read_only=True)
     class Meta:
         model = Ticket
-        fields = ['id', 'showtime', 'seat', 'booking', 'held_by', 'held_until']
+        fields = ['id', 'showtime', 'seat', 'held_by', 'held_until']
 
 
 # class BookingSerializer(serializers.ModelSerializer):
