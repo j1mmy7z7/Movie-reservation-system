@@ -11,6 +11,8 @@ from system.serializers import (
 from django.utils import timezone
 from datetime import timedelta
 from rest_framework.permissions import IsAuthenticated
+from django.db.models import Q
+
 
 logger = logging.getLogger(__name__)
 
@@ -104,7 +106,11 @@ class CancelTickets(views.APIView):
             logger.info(f"CancelTickets POST request received for user {request.user.username}")
             ticket_ids = request.data.get("ticket_ids", [])
             tickets = Ticket.objects.filter(
-                id__in=ticket_ids, status=Ticket.Status.BOOKED, held_by=request.user
+                id__in=ticket_ids,
+                held_by=request.user,
+            ).filter(
+                Q(status=Ticket.Status.HELD) |
+                Q(status=Ticket.Status.BOOKED)
             )
             cutoff = timezone.now() + timedelta(minutes=10)
             tickets = tickets.filter(showtime__start_time__gt=cutoff)
