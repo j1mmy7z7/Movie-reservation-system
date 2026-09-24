@@ -2,6 +2,7 @@ import logging
 
 from rest_framework import generics
 from system.serializers import RegistrationSerializer, ClientSerializer
+from system.models import Client
 from rest_framework.permissions import IsAuthenticated
 
 
@@ -24,6 +25,7 @@ class Register(generics.CreateAPIView):
 class ClientDetail(generics.RetrieveAPIView):
     serializer_class = ClientSerializer
     permission_classes = [IsAuthenticated]
+    queryset = Client.objects.prefetch_related("ticket_set")
 
     def get_object(self):
         logger.info(f"Fetching data for client: {self.request.user.username}")
