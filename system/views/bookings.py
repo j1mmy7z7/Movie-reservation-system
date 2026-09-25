@@ -1,6 +1,7 @@
 import logging
 
-from rest_framework import generics, response, views, status
+from rest_framework import generics, response, serializers, views, status
+from drf_spectacular.utils import OpenApiExample, extend_schema, inline_serializer
 from system.models import (Ticket, MpesaPayment)
 from system.serializers import (
     TicketSerializer,
@@ -10,7 +11,7 @@ from system.serializers import (
 )
 from django.utils import timezone
 from datetime import timedelta
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.db.models import Q
 
 
@@ -101,6 +102,29 @@ class CancelTickets(views.APIView):
     """
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(
+        tags=["Tickets"],
+        request=inline_serializer(
+            name="CancelTicketsRequest",
+            fields={"ticket_ids": serializers.ListField(child=serializers.UUIDField())},
+        ),
+        responses=inline_serializer(
+            name="CancelTicketsResponse",
+            fields={"cancelled": serializers.IntegerField()},
+        ),
+        examples=[
+            OpenApiExample(
+                "Cancel two tickets",
+                value={"ticket_ids": ["123e4567-e89b-12d3-a456-426614174000"]},
+                request_only=True,
+            ),
+            OpenApiExample(
+                "Cancelled count",
+                value={"cancelled": 2},
+                response_only=True,
+            ),
+        ],
+    )
     def post(self, request):
         try:
             logger.info(f"CancelTickets POST request received for user {request.user.username}")
@@ -129,8 +153,44 @@ class MpesaCallback(views.APIView):
     """
     Handle the M-Pesa callback from the payment gateway.
     """
+    permission_classes = [AllowAny]
+    authentication_classes = []
 
-
+    @extend_schema(
+        tags=["Payments"],
+        auth=[],
+        request=inline_serializer(
+            name="MpesaCallbackRequest",
+            fields={"Body": serializers.DictField(child=serializers.JSONField())},
+        ),
+        responses=inline_serializer(
+            name="MpesaCallbackResponse",
+            fields={
+                "ResultCode": serializers.IntegerField(),
+                "ResultDesc": serializers.CharField(),
+            },
+        ),
+        examples=[
+            OpenApiExample(
+                "Safaricom stkCallback",
+                value={
+                    "Body": {
+                        "stkCallback": {
+                            "CheckoutRequestID": "ws_CO_123",
+                            "ResultCode": 0,
+                            "CallbackMetadata": {"Item": []},
+                        }
+                    }
+                },
+                request_only=True,
+            ),
+            OpenApiExample(
+                "Accepted",
+                value={"ResultCode": 0, "ResultDesc": "Accepted"},
+                response_only=True,
+            ),
+        ],
+    )
     def post(self, request):
         body = request.data.get("Body", {}).get("stkCallback", {})
         checkout_request_id = body.get("CheckoutRequestID")
