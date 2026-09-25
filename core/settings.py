@@ -32,7 +32,8 @@ MPESA_CALLBACK_URL = env("MPESA_CALLBACK_URL")
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-hajo8^$z#p=wm97v^ru1dnp^z@+n08g=dqgcc9cjytivs9rh%t"
+
+SECRET_KEY = env("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
