@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from system.models import Client
-from system.serializers import TicketSerializer
+from .ticket_serializer import TicketSerializer
 
 
 """
